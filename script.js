@@ -46,7 +46,7 @@ function isPlayableKey(key) {
 
 // Function to play a sound for a specific key
 function playSound(key) {
-  const sound = new Audio(`./songs/${key}.mp3`);
+  const sound = new Audio(`./songs/${key.toLowerCase()}.mp3`);
   sound.play();
   span.innerHTML = key;
   return sound;
