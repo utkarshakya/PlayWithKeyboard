@@ -3,7 +3,7 @@ const span = document.querySelector("#text");
 
 // Set of non-playable keys
 const nonPlayableKeys = new Set([
-  "Tab", "Alt", "Escape", "Control", "CapsLock", "F1", "F2", "F3", "F4",
+  "Tab", "Alt", "Escape", " ", "CapsLock", "F1", "F2", "F3", "F4",
   "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "Insert", "Pause",
   "ScrollLock", "Delete", "Home", "PageUp", "PageDown", "End", "ArrowUp",
   "ArrowDown", "ArrowRight", "ArrowLeft", "`", "~", "!", "@", "#", "$", "%",
@@ -24,8 +24,8 @@ function startGame(e) {
 
   // Display non-playable key names
   if (nonPlayableKeys.has(key)) {
-    span.innerHTML = key;
-    if(key === "Control" && started) stopSound(currentSound);
+    span.innerHTML = key === ' ' ? 'Space' : key;
+    if (key === " " && started) stopSound(currentSound);
   }
   // Handle playable keys
   else if (isPlayableKey(key)) {
@@ -38,7 +38,7 @@ function startGame(e) {
 // Helper function to check if a key is playable
 function isPlayableKey(key) {
   return (
-    ["Backspace", "Enter", "Shift", " "].includes(key) ||
+    ["Backspace", "Enter", "Shift", "Control"].includes(key) ||
     (key >= "0" && key <= "9") ||
     (key.toLowerCase() >= "a" && key.toLowerCase() <= "z")
   );
@@ -46,9 +46,9 @@ function isPlayableKey(key) {
 
 // Function to play a sound for a specific key
 function playSound(key) {
-  const sound = key === " " ? new Audio(`./songs/space.mp3`) : new Audio(`./songs/${key}.mp3`);
+  const sound = new Audio(`./songs/${key}.mp3`);
   sound.play();
-  span.innerHTML = key === " " ? "Space" : key;
+  span.innerHTML = key;
   return sound;
 }
 
@@ -58,4 +58,55 @@ function stopSound(sound) {
     sound.pause();
     sound.currentTime = 0;
   }
+}
+
+// --- Mobile ---
+const mobileStartButton = document.getElementById('start-button');
+const popKeyboard = document.getElementById('pop-keyboard');
+
+mobileStartButton.addEventListener('click', () => {
+  popKeyboard.focus();
+  mobileStartButton.style.display = "none";
+})
+
+popKeyboard.addEventListener('blur', () => {
+  showBtn();
+})
+
+function showBtn() {
+  mobileStartButton.style.display = "block";
+}
+
+// Getting the key on mobile screen
+popKeyboard.addEventListener('input', () => {
+  const currentInput = popKeyboard.value
+  popKeyboard.value = '';
+  const obj = {}
+  obj.key = currentInput;
+  startGame(obj);
+})
+
+
+const fullHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const vh = window.visualViewport.height;
+    if (vh === fullHeight) {
+      if (document.activeElement === popKeyboard) {
+        popKeyboard.blur();
+        showBtn();
+      }
+    }
+  });
+} else {
+  // Fallback for browsers without visualViewport
+  window.addEventListener('resize', () => {
+    if (window.innerHeight === fullHeight) {
+      if (document.activeElement === popKeyboard) {
+        popKeyboard.blur();
+        showBtn();
+      }
+    }
+  });
 }
